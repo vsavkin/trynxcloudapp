@@ -1,0 +1,54 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2.1
+
+executors:
+  default:
+    working_directory: ~/repo
+    environment:
+      NX_BRANCH: 'computedInSteps'
+      NX_RUN_GROUP: << pipeline.number >>
+
+    docker:
+      - image: circleci/node:12-browsers
+
+commands:
+  yarn_install:
+    description: 'Install Dependencies'
+    steps:
+      - run: yarn install --frozen-lockfile --non-interactive
+  setup:
+    description: 'Setup Executor'
+    steps:
+      - run:
+          name: Set PR number to NX_BRANCH
+          command: |
+            echo 'export NX_BRANCH="${CIRCLE_PR_NUMBER:-${CIRCLE_PULL_REQUEST##*/}}"' >> $BASH_ENV
+            source $BASH_ENV
+            echo $NX_BRANCH
+      - run: echo $NX_BRANCH
+      - checkout
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: ..
+
+jobs:
+  checks-and-unit-tests:
+    executor: default
+    steps:
+      - checkout
+      - yarn_install
+      - setup
+      - run:
+          name: Run Unit Tests
+          command: npx nx run-many --target=test --all
+      - run:
+          name: Run Lint Checks
+          command: npx nx run-many --target=lint --all
+workflows:
+  version: 2.1
+  default_workflow:
+    jobs:
+      - checks-and-unit-tests
