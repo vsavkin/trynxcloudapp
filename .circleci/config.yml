@@ -35,14 +35,11 @@ commands:
           at: ..
 
 jobs:
-  install:
+  checks-and-unit-tests:
     executor: default
     steps:
       - checkout
       - yarn_install
-  checks-and-unit-tests:
-    executor: default
-    steps:
       - setup
       - run:
           name: Run Unit Tests
@@ -54,7 +51,4 @@ workflows:
   version: 2.1
   default_workflow:
     jobs:
-      - install
-      - checks-and-unit-tests:
-          requires:
-            - install
+      - checks-and-unit-tests
