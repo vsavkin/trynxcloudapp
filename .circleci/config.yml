@@ -46,10 +46,10 @@ jobs:
       - setup
       - run:
           name: Run Unit Tests
-          command: nx run-many --target=test --all
+          command: npx nx run-many --target=test --all
       - run:
           name: Run Lint Checks
-          command: nx run-many --target=lint --all
+          command: npx nx run-many --target=lint --all
 workflows:
   version: 2.1
   default_workflow:
